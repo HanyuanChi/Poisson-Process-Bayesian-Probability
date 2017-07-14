@@ -1,0 +1,241 @@
+---
+title: "Problem 4"
+subtitle: "HW2"
+author: "Hanyuan Chi(chixx105), Zhi Shen(shenx704)"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output: pdf_document
+---
+
+```{r}
+suppressPackageStartupMessages({
+  library(purrr)
+  library(ggplot2)
+  library(dplyr)
+})
+
+options(scipen = 99) # Penalize scientific notation
+
+set.seed(123456) # PLEASE DO NOT CHANGE THE SEED
+
+```
+
+# Flipping Coins like a Bayesian
+
+This is a classic example that is used in almost any course on Bayesian probability. This exercise guides you through the full cycle of what Bayesian computation is like.
+
+Here is the problem:
+
+---------
+
+You stop by during my office hours and see a coin on my desk. You are not completely sure if it is actually a fair coin or a biased one (and if it is a biased one how biased it is).
+
+I see your doubt and ask you to find out how biased (or how fair) you think this coin is. You are allowed to flip the coin several times and after observing the result, you should form some consistent belief about the coin's biasedness.
+
+You should be consistently updating your beliefs in the face of new evidence.
+
+---------
+
+Let's represent the measure of biasedness of coin as the coin's probability of heads. Then the fair coin would have the "biasedness" of 0.5. As another example, the perfectly "biased" one would have "biasedness" of 0 (always lands on Tails) or 1 (always lands on Heads).
+
+Assume your reasonable prior belief (density) about this coin is uniform. Basically, with equal likelihood it could be a completely fair coin or an absolutely biased one or anything in between
+
+$$
+P(\mathrm{Biasedness}=x) = 1\quad\forall x\in (0,1)
+$$
+
+## Question 1
+
+Before we start the problem, let's take a look at [Beta distribution](https://en.wikipedia.org/wiki/Beta_distribution). (Please check the Wikipedia link). This seemingly complex and overly mathematical distribution plays an important role in Bayesian Analysis.
+
+First of all, don't get scared by its PDF. All you need to know is if $x\sim Be(\alpha,\beta)$ then
+
+$$
+P(x) = C x^{\alpha-1}(1-x)^{\beta-1},
+\quad\mbox{ where } x\in (0,1)
+$$
+where $C$ is just a constant scaling factor.
+
+
+The importance of Beta distribution comes from several facts:
+
+1. it is an excellent **conjugate prior** to many discrete distributions (like Bernoulli, Binomial etc)
+
+1. it is very flexible. By changing parameters $\alpha$ and $\beta$ you can represent all kinds of different shapes.
+
+For example, $Be(1,1)$ is a uniform distribution. Here is your prior belief about the coin represented in terms of the beta distribution:
+
+```{r, fig.height=2}
+ggplot(data.frame(x=c(-0.5,1.5)),aes(x)) +
+  stat_function(fun = partial(dbeta,
+                              shape1=1,
+                              shape2=1),
+                n=91) +
+  xlab("biasedness (probability of heads)") +
+  ylab("plausibility") +
+  theme_bw()
+```
+
+
+For question 1, please try playing with different shapes of Beta distribution to see what it looks like.
+
+Try both shape parameters that are greater than 1 and also that are less than 1. Check how it affects the shape of the PDF.
+
+Please plot the shape that you liked the most.
+
+```{r, fig.height=2}
+# Please write your code below
+ggplot(data.frame(x=c(-0.5,1.5)),aes(x)) +
+  stat_function(fun = partial(dbeta,
+                              shape1=0.5,
+                              shape2=0.5),
+                n=91) +
+  xlab("biasedness (probability of heads)") +
+  ylab("plausibility") +
+  theme_bw()
+
+```
+
+You should see why Beta distribution has enough capacity to describe all kinds of beliefs about biasedness of a coin.
+
+## Question 2
+
+Please write down the likelihood function for this problem. As you remember, the likelihood is probability of data given the model. 
+
+Output:
+
+* Feel free to use either LaTeX or just attach a scanned picture of your JPG drawing
+    - if you decided to go the JPG route, please replace file `problem4-likelihood.jpg` so that it contains the scan of your derivation.
+    
+If you opted for including the images rather than LaTeX, please make sure the PDF is readable when printed!     
+    
+$$
+L = 
+$$
+
+\centerline{\includegraphics[height=6in]{problem4-likelihood.jpg}}
+
+\clearpage
+
+## Question 3
+
+* Assume that your first coin flip landed on Heads.
+Please derive the posterior distribution.
+
+Output:
+
+* Feel free to use either LaTeX or just attach a scanned picture of your JPG drawing
+    - if you decided to go the JPG route, please replace file `problem4-posterior.jpg` so that it contains the scan of your derivation
+   
+$$
+P(\mathrm{Biasedness}=x|H) = 
+$$
+
+
+\centerline{\includegraphics[height=6in]{problem4-posterior.jpg}}
+
+* Note that your result should also end up being a Beta distribution but with slightly changed shape parameters!
+    - this is exactly the idea of **conjugate priors**!
+    - if your prior is Beta and your likelihood is Bernoulli then your posterior is also Beta!
+    - in other words, the prior and posterior belong to the same family of distributions -- just the shape parameters are changed.
+    
+
+## Question 4
+
+Please plot the PDF of your posterior after observing 1 Head
+
+* Please use `stat_function`, `partial` and `dbeta` like I used above
+    - this will force you to compute shape parameters for Beta (rather than just trying to plot some arbitrary function)
+    
+* Output:
+    - please save your plot into `p4` variable
+    
+```{r}
+p4 <- ggplot(data.frame(x=c(-0.5,1.5)),aes(x)) +
+  stat_function(fun = partial(dbeta,
+                              shape1=2,
+                              shape2=1),
+                n=91) +
+  xlab("biasedness (probability of heads)") +
+  ylab("plausibility") +
+  theme_bw()
+p4
+
+```
+
+
+## Question 5
+
+Assume you flipped the coin 2 more times and both of them turned out to be Heads as well. Please plot the PDF of your posterior after observing 3 Heads in a row $P(\mathrm{Biasedness}=x|HHH)$
+
+* Please use `stat_function`, `partial` and `dbeta` like I used above
+    - this will force you to compute shape parameters for Beta (rather than just trying to plot some arbitrary function)
+    
+* Output:
+    - please save your plot into `p5` variable
+
+```{r}
+ p5 <- ggplot(data.frame(x=c(-0.5,1.5)),aes(x)) +
+  stat_function(fun = partial(dbeta,
+                              shape1=4,
+                              shape2=1),
+                n=91) +
+  xlab("biasedness (probability of heads)") +
+  ylab("plausibility") +
+  theme_bw()
+ p5
+
+```
+
+* You should clearly see how your belief starts shifting towards the idea that the coin is quite biased.
+
+## Question 6
+
+Assume you flipped the coin 1 more times and this time its Tails. Please plot the PDF of your posterior after observing 3 Heads in a row then followed by 1 Tail $P(\mathrm{Biasedness}=x|HHHT)$
+
+* Please use `stat_function`, `partial` and `dbeta` like I used above
+    - this will force you to compute shape parameters for Beta (rather than just trying to plot some arbitrary function)
+
+
+* Output:
+    - please save your plot into `p6` variable
+    
+```{r}
+p6 <- ggplot(data.frame(x=c(-0.5,1.5)),aes(x)) +
+  stat_function(fun = partial(dbeta,
+                              shape1=4,
+                              shape2=2),
+                n=91) +
+  xlab("biasedness (probability of heads)") +
+  ylab("plausibility") +
+  theme_bw()
+p6
+
+```
+
+* You should clearly see that the model will immediately responds to that coin flip. The model will (correctly) realise that the bias (even if it exists) cannot be extremely large.
+
+
+## Question 7
+
+Assume you flipped the coin 2 more times and it landed on Tails bothtimes. Please plot the PDF of your posterior after observing 3 Heads in a row then followed by 3 Tails $P(\mathrm{Biasedness}=x|HHHTTT)$
+
+* Please use `stat_function`, `partial` and `dbeta` like I used above
+    - this will force you to compute shape parameters for Beta (rather than just trying to plot some arbitrary function)
+
+* Output:
+    - please save your plot into `p7` variable
+    
+```{r}
+ p7 <- ggplot(data.frame(x=c(-0.5,1.5)),aes(x)) +
+  stat_function(fun = partial(dbeta,
+                              shape1=4,
+                              shape2=4),
+                n=91) +
+  xlab("biasedness (probability of heads)") +
+  ylab("plausibility") +
+  theme_bw()
+ p7
+
+```
+
+* The belief proposed by the model should make total sense to you by now.

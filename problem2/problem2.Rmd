@@ -1,0 +1,91 @@
+---
+title: "Problem 2"
+subtitle: "HW2"
+author: "Hanyuan Chi(chixx105), Zhi Shen(shenx704)"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output: pdf_document
+---
+
+```{r}
+suppressPackageStartupMessages({
+  library(purrr)
+  library(tidyr)
+  library(ggplot2)
+  library(dplyr)
+})
+
+set.seed(123456) # PLEASE DO NOT CHANGE THE SEED
+
+```
+
+# Monte-Carlo Simulations for Poisson Process
+
+You are working for Poisson Car Dealerships Inc. and your task is to optimize the employment in a particular popular car dealership location.
+
+The customers arrive to that dealership according to a Poisson arrival process
+(meaning that the number of customers that will arrive to the dealership on a particular hour is distributed with Poisson distribution and average arrival rate $\lambda$)
+
+Salesmen are assigned to customers on 1-on-1 basis. Say, if 1 customer comes in at 3pm, then he occupies 1 salesman for that entire hour. The occupied salesman will be free again at 4pm to work with another customer.
+
+Assume your dealership is open 24 hours a day / 7 days a week.
+
+## Question 1
+
+* Please simulate one possible future for the next month (30 days = 720 hours) assuming the average arrival rate $\lambda=6$ customers per hour.
+
+* Hints:
+    - you will need to use what you know about Poisson distribution
+
+
+* Output:
+    - Please create data.frame `df1` with $N$ rows that contains your sample values in column `df1$X`, current hour (in 0-23 format) in `df1$hour` and current day (in 1-30 format) `df1$day`.
+
+```{r}
+pois_lambda <- 6
+N <- 720L
+
+# Please write your code below
+
+df1 <- data.frame(X = rpois(N,pois_lambda),
+                  hour = rep(0:23, N/24),
+                  day = rep(1:30, each=24))
+head(df1)
+```
+
+## Question 2
+
+* Please simulate $R=2000L$ possible ways your future may look for the next month (30 days = 720 hours)
+
+
+* Output:
+    - Please create data.frame `df2` with $N\times R$ rows that contains your sample values in column `df2$X`, current hour (in 0-23 format) in `df2$hour`, current day (in 1-30 format) `df2$day` and sample id in column `df2$id`.
+
+```{r}
+R <- 2000L
+
+# Please write your code below
+
+df2 <- data.frame(id = rep(1:R, each=N),
+                  X = rpois(R*N,pois_lambda),
+                  hour = rep(0:23, R*N/24),
+                  day = rep(rep(1:30, each=24),R))
+head(df2)
+
+```
+
+## Question 3
+
+* Please compute how many salesmen you should keep on duty each hour to make sure that in 99% of **hours** there are enough salesmen for every customer (without waiting).
+
+* Hints:
+    - you may want to look at `quantile()` function
+
+* Output:
+    - Please save the value into numeric variable `q3`
+
+```{r}
+# Please write your code below
+
+q3 <- quantile(df2$X,0.99)
+q3
+```
